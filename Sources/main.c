@@ -45,7 +45,7 @@ static inline void show_digs(Digit a, Digit b, Digit c, Digit d, size_t dot);
 
 static State state = STATE_SHOW_TIME;
 
-static unsigned time[] = { 1, 5, 5, 7 };
+static unsigned time[] = { 0, 0, 0, 0 };
 
 static Digit MENU_DIGITS[] = { DIG_t, DIG_b, DIG_NONE, DIG_NONE };
 

@@ -433,38 +433,38 @@ LOAD /opt/Freescale/KDS_v3/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv6-m/
                 0x1ffffc00                . = ALIGN (0x8)
                 0x1ffffc00                _mtb_end = .
 
-.data           0x1ffffc00       0x78 load address 0x00000edc
+.data           0x1ffffc00       0x68 load address 0x00000edc
                 0x1ffffc00                . = ALIGN (0x4)
                 0x1ffffc00                __DATA_RAM = .
                 0x1ffffc00                __data_start__ = .
  *(.data)
  *(.data*)
- .data.time     0x1ffffc00       0x10 ./Sources/main.o
  .data.brightness
-                0x1ffffc10        0x4 ./Sources/main.o
+                0x1ffffc00        0x4 ./Sources/main.o
  .data.impure_data
-                0x1ffffc14       0x60 /opt/Freescale/KDS_v3/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/../../../../arm-none-eabi/lib/armv6-m/libg_s.a(lib_a-impure.o)
+                0x1ffffc04       0x60 /opt/Freescale/KDS_v3/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/../../../../arm-none-eabi/lib/armv6-m/libg_s.a(lib_a-impure.o)
  *(.jcr*)
- .jcr           0x1ffffc74        0x0 /opt/Freescale/KDS_v3/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv6-m/crtbegin.o
- .jcr           0x1ffffc74        0x4 /opt/Freescale/KDS_v3/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv6-m/crtend.o
-                0x1ffffc78                . = ALIGN (0x4)
-                0x1ffffc78                __data_end__ = .
-                0x00000f54                __DATA_END = (__DATA_ROM + (__data_end__ - __data_start__))
+ .jcr           0x1ffffc64        0x0 /opt/Freescale/KDS_v3/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv6-m/crtbegin.o
+ .jcr           0x1ffffc64        0x4 /opt/Freescale/KDS_v3/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv6-m/crtend.o
+                0x1ffffc68                . = ALIGN (0x4)
+                0x1ffffc68                __data_end__ = .
+                0x00000f44                __DATA_END = (__DATA_ROM + (__data_end__ - __data_start__))
 
-.igot.plt       0x1ffffc78        0x0 load address 0x00000f54
+.igot.plt       0x1ffffc68        0x0 load address 0x00000f44
  .igot.plt      0x00000000        0x0 /opt/Freescale/KDS_v3/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv6-m/crtbegin.o
 
-.bss            0x1ffffc78       0x20 load address 0x00000f54
-                0x1ffffc78                . = ALIGN (0x4)
-                0x1ffffc78                __START_BSS = .
-                0x1ffffc78                __bss_start__ = .
+.bss            0x1ffffc68       0x30 load address 0x00000f44
+                0x1ffffc68                . = ALIGN (0x4)
+                0x1ffffc68                __START_BSS = .
+                0x1ffffc68                __bss_start__ = .
  *(.bss)
- .bss           0x1ffffc78       0x1c /opt/Freescale/KDS_v3/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv6-m/crtbegin.o
+ .bss           0x1ffffc68       0x1c /opt/Freescale/KDS_v3/toolchain/bin/../lib/gcc/arm-none-eabi/4.8.4/armv6-m/crtbegin.o
  *(.bss*)
- .bss.state     0x1ffffc94        0x2 ./Sources/main.o
+ .bss.state     0x1ffffc84        0x2 ./Sources/main.o
+ *fill*         0x1ffffc86        0x2 
+ .bss.time      0x1ffffc88       0x10 ./Sources/main.o
  *(COMMON)
                 0x1ffffc98                . = ALIGN (0x4)
- *fill*         0x1ffffc96        0x2 
                 0x1ffffc98                __bss_end__ = .
                 0x1ffffc98                __END_BSS = .
 
