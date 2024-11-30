@@ -1,5 +1,5 @@
-#ifndef PORTS_H_INCLUDED
-#define PORTS_H_INCLUDED
+#ifndef GPIO_H_INCLUDED
+#define GPIO_H_INCLUDED
 
 #include "MKL05Z4.h"
 
@@ -44,7 +44,7 @@ static const Digit DIGIT[] = {
 	DIG_0, DIG_1, DIG_2, DIG_3, DIG_4, DIG_5, DIG_6, DIG_7, DIG_8, DIG_9
 };
 
-void init_ports(void);
+void gpio_init(void);
 
 static inline void show(Digit val, Display dis) {
 	GPIOA_PSOR = DIS_ALL;
@@ -53,4 +53,4 @@ static inline void show(Digit val, Display dis) {
 	GPIOB_PSOR = val;
 }
 
-#endif // PORTS_H_INCLUDED
+#endif // GPIO_H_INCLUDED

@@ -1,10 +1,12 @@
-#include "ports.h"
+#include "gpio.h"
 
 #include "MKL05Z4.h"
 
-void init_ports() {
-	SIM_SCGC5 = (SIM_SCGC5_PORTA_MASK | SIM_SCGC5_PORTB_MASK);
+void gpio_init(void) {
+	// Enable clock on ports
+	SIM_SCGC5 = SIM_SCGC5_PORTA_MASK | SIM_SCGC5_PORTB_MASK;
 
+	// Port configuration for ports. Enable on GPIO.
 	enum { PCR = PORT_PCR_MUX(1) };
 
 	PORTA_PCR8 = PCR;
@@ -21,6 +23,7 @@ void init_ports() {
 	PORTB_PCR10 = PCR;
 	PORTB_PCR11 = PCR;
 
+	// Enable ports as output.
 	GPIOA_PDDR = DIS_ALL;
 	GPIOB_PDDR = DIG_ALL;
 }
