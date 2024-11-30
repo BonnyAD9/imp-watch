@@ -54,7 +54,6 @@ Discarded input sections
  .data          0x00000000        0x0 ./Sources/ports.o
  .bss           0x00000000        0x0 ./Sources/ports.o
  .rodata.DIGIT  0x00000000       0x14 ./Sources/ports.o
- .debug_macro   0x00000000      0x802 ./Sources/ports.o
  .debug_macro   0x00000000       0x16 ./Sources/ports.o
  .debug_macro   0x00000000       0x16 ./Sources/ports.o
  .debug_macro   0x00000000       0x44 ./Sources/ports.o
@@ -453,22 +452,23 @@ OUTPUT(imp-watch.elf elf32-littlearm)
  .debug_ranges  0x00000028       0x10 ./Sources/ports.o
  .debug_ranges  0x00000038       0x18 ./Project_Settings/Startup_Code/system_MKL05Z4.o
 
-.debug_macro    0x00000000     0x7357
+.debug_macro    0x00000000     0x7b65
  .debug_macro   0x00000000       0x91 ./Sources/main.o
- .debug_macro   0x00000091      0x802 ./Sources/main.o
- .debug_macro   0x00000893       0x16 ./Sources/main.o
- .debug_macro   0x000008a9       0x16 ./Sources/main.o
- .debug_macro   0x000008bf       0x44 ./Sources/main.o
- .debug_macro   0x00000903      0x209 ./Sources/main.o
- .debug_macro   0x00000b0c       0x3a ./Sources/main.o
- .debug_macro   0x00000b46       0x3a ./Sources/main.o
- .debug_macro   0x00000b80       0x26 ./Sources/main.o
- .debug_macro   0x00000ba6      0x306 ./Sources/main.o
- .debug_macro   0x00000eac       0x57 ./Sources/main.o
- .debug_macro   0x00000f03     0x62f9 ./Sources/main.o
- .debug_macro   0x000071fc       0x91 ./Sources/ports.o
- .debug_macro   0x0000728d       0x7e ./Project_Settings/Startup_Code/system_MKL05Z4.o
- .debug_macro   0x0000730b       0x4c ./Project_Settings/Startup_Code/system_MKL05Z4.o
+ .debug_macro   0x00000091      0x80e ./Sources/main.o
+ .debug_macro   0x0000089f       0x16 ./Sources/main.o
+ .debug_macro   0x000008b5       0x16 ./Sources/main.o
+ .debug_macro   0x000008cb       0x44 ./Sources/main.o
+ .debug_macro   0x0000090f      0x209 ./Sources/main.o
+ .debug_macro   0x00000b18       0x3a ./Sources/main.o
+ .debug_macro   0x00000b52       0x3a ./Sources/main.o
+ .debug_macro   0x00000b8c       0x26 ./Sources/main.o
+ .debug_macro   0x00000bb2      0x306 ./Sources/main.o
+ .debug_macro   0x00000eb8       0x57 ./Sources/main.o
+ .debug_macro   0x00000f0f     0x62f9 ./Sources/main.o
+ .debug_macro   0x00007208       0x91 ./Sources/ports.o
+ .debug_macro   0x00007299      0x802 ./Sources/ports.o
+ .debug_macro   0x00007a9b       0x7e ./Project_Settings/Startup_Code/system_MKL05Z4.o
+ .debug_macro   0x00007b19       0x4c ./Project_Settings/Startup_Code/system_MKL05Z4.o
 
 .debug_line     0x00000000      0x6ee
  .debug_line    0x00000000      0x248 ./Sources/main.o
@@ -476,12 +476,12 @@ OUTPUT(imp-watch.elf elf32-littlearm)
  .debug_line    0x00000431       0x7b ./Project_Settings/Startup_Code/startup_MKL05Z4.o
  .debug_line    0x000004ac      0x242 ./Project_Settings/Startup_Code/system_MKL05Z4.o
 
-.debug_str      0x00000000    0x265b8
- .debug_str     0x00000000    0x26408 ./Sources/main.o
-                              0x26805 (size before relaxing)
- .debug_str     0x00026408      0x119 ./Sources/ports.o
+.debug_str      0x00000000    0x266b0
+ .debug_str     0x00000000    0x2642c ./Sources/main.o
+                              0x26829 (size before relaxing)
+ .debug_str     0x0002642c      0x1ed ./Sources/ports.o
                               0x268e8 (size before relaxing)
- .debug_str     0x00026521       0x97 ./Project_Settings/Startup_Code/system_MKL05Z4.o
+ .debug_str     0x00026619       0x97 ./Project_Settings/Startup_Code/system_MKL05Z4.o
                               0x26862 (size before relaxing)
 
 .comment        0x00000000       0x70
