@@ -17,13 +17,17 @@
 
 typedef enum {
 	STATE_PRIMARY = 0xff00,
-	STATE_SECONDARY = 0xff,
+	STATE_SEC = 0xff,
 	STATE_SHOW_TIME = 0x0,
 	STATE_EDIT_TIME = 0x100,
 	STATE_EDIT_TIME_HH = 0x100,
 	STATE_EDIT_TIME_HL,
 	STATE_EDIT_TIME_MH,
 	STATE_EDIT_TIME_ML,
+	STATE_MENU = 0x200,
+	STATE_MENU_TIME = 0x200,
+	STATE_MENU_BRIGHTNESS = 0x201,
+	STATE_BRIGHTNESS = 0x300,
 } State;
 
 static void btn_change(void);
@@ -34,12 +38,15 @@ static void clock_tick(void);
 static void clock_truncate(void);
 static void bright_wait(void);
 static void init(void);
-static void show_err(void);
 static void show_time(size_t dot);
+static inline void show_msg(Digit *d, size_t dot);
+static inline void show_digs(Digit a, Digit b, Digit c, Digit d, size_t dot);
 
 static State state = STATE_SHOW_TIME;
 
 static unsigned time[] = { 1, 5, 5, 7 };
+
+static Digit MENU_DIGITS[] = { DIG_t, DIG_b, DIG_NONE, DIG_NONE };
 
 // Hours high (first digit)
 #define HH (time[0])
@@ -98,10 +105,22 @@ static void display(void) {
 			show_time(1);
 			break;
 		case STATE_EDIT_TIME:
-			show_time(state & STATE_SECONDARY);
+			show_time(state & STATE_SEC);
+			break;
+		case STATE_MENU:
+			show_digs(DIG_t, DIG_b, DIG_NONE, DIG_NONE, state & STATE_SEC);
+			break;
+		case STATE_BRIGHTNESS:
+			show_digs(
+				DIG_b,
+				DIG_NONE,
+				brightness == 10 ? DIG_1 : DIG_NONE,
+				brightness == 10 ? DIG_0 : DIGIT[brightness],
+				1
+			);
 			break;
 		default:
-			show_err();
+			show_digs(DIG_E, DIG_r, DIG_o, DIG_r, ~0);
 			break;
 	}
 }
@@ -111,8 +130,19 @@ static void short_press(void) {
 		case STATE_SHOW_TIME:
 			break;
 		case STATE_EDIT_TIME:
-			++time[state & STATE_SECONDARY];
+			++time[state & STATE_SEC];
 			clock_truncate();
+			break;
+		case STATE_MENU_TIME:
+			state = state == STATE_MENU_TIME
+				? STATE_MENU_BRIGHTNESS
+				: STATE_SHOW_TIME;
+			break;
+		case STATE_BRIGHTNESS:
+			++brightness;
+			if (brightness > 10) {
+				brightness = 0;
+			}
 			break;
 	}
 }
@@ -120,8 +150,14 @@ static void short_press(void) {
 static void long_press(void) {
 	switch (state) {
 		case STATE_SHOW_TIME:
+			state = STATE_MENU;
+			break;
+		case STATE_MENU_TIME:
 			rtc_tick(false);
 			state = STATE_EDIT_TIME;
+			break;
+		case STATE_MENU_BRIGHTNESS:
+			state = STATE_BRIGHTNESS;
 			break;
 		case STATE_EDIT_TIME_HH:
 		case STATE_EDIT_TIME_HL:
@@ -132,6 +168,9 @@ static void long_press(void) {
 			state = STATE_SHOW_TIME;
 			RTC_TAR = NOW + TICK_LEN;
 			rtc_tick(true);
+			break;
+		case STATE_BRIGHTNESS:
+			state = STATE_SHOW_TIME;
 			break;
 	}
 }
@@ -215,13 +254,15 @@ static void show_time(size_t dot) {
 	}
 }
 
-static void show_err(void) {
-	show(DIG_E, DIS_0);
-	bright_wait();
-	show(DIG_r, DIS_1);
-	bright_wait();
-	show(DIG_o, DIS_2);
-	bright_wait();
-	show(DIG_r, DIS_3);
-	bright_wait();
+static inline void show_msg(Digit *d, size_t dot) {
+	for (size_t i = 0; i < DISPLAY_LEN; ++i) {
+		Digit base = i == dot ? SEG_DP : DIG_NONE;
+		show(d[i] | base, DISPLAY[i]);
+		bright_wait();
+	}
+}
+
+static inline void show_digs(Digit a, Digit b, Digit c, Digit d, size_t dot) {
+	Digit msg[] = { a, b, c, d };
+	show_msg(msg, dot);
 }
