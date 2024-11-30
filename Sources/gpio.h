@@ -12,7 +12,10 @@ typedef enum {
 	SEG_F = 1 << 10,
 	SEG_G = 1 << 11,
 	SEG_DP = 1 << 3,
+	SEG_BTN = 1 << 4,
 } Segment;
+
+#define IS_PRESSED (!(GPIOB_PDIR & SEG_BTN))
 
 typedef enum {
 	DIG_ALL = 0xf0f,
@@ -42,6 +45,9 @@ typedef enum {
 	DIS_3 = 1 << 8,
 } Display;
 
+static const Display DISPLAY[] = { DIS_0, DIS_1, DIS_2, DIS_3 };
+#define DISPLAY_LEN (sizeof(DISPLAY) / sizeof(*DISPLAY))
+
 static const Digit DIGIT[] = {
 	DIG_0, DIG_1, DIG_2, DIG_3, DIG_4, DIG_5, DIG_6, DIG_7, DIG_8, DIG_9
 };
@@ -50,8 +56,8 @@ void gpio_init(void);
 
 static inline void show(Digit val, Display dis) {
 	GPIOA_PSOR = DIS_ALL;
-	GPIOA_PCOR = dis;
 	GPIOB_PCOR = DIG_ALL;
+	GPIOA_PCOR = dis;
 	GPIOB_PSOR = val;
 }
 

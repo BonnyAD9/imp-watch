@@ -7,7 +7,7 @@ void gpio_init(void) {
 	SIM_SCGC5 = SIM_SCGC5_PORTA_MASK | SIM_SCGC5_PORTB_MASK;
 
 	// Port configuration for ports. Enable on GPIO.
-	enum { PCR = PORT_PCR_MUX(1) };
+	enum { MUX_GPIO = 0x1, PCR = PORT_PCR_MUX(MUX_GPIO) };
 
 	PORTA_PCR8 = PCR;
 	PORTA_PCR9 = PCR;
@@ -26,4 +26,15 @@ void gpio_init(void) {
 	// Enable ports as output.
 	GPIOA_PDDR = DIS_ALL;
 	GPIOB_PDDR = DIG_ALL;
+
+	// Setup button input
+	NVIC_DisableIRQ(PORTB_IRQn);
+	enum { INT_ANY_EDGE = 0xb };
+	PORTB_PCR4 = PORT_PCR_ISF(1)
+		| PORT_PCR_IRQC(INT_ANY_EDGE)
+		| PORT_PCR_MUX(MUX_GPIO)
+		| PORT_PCR_PE_MASK
+		| PORT_PCR_PS_MASK; // Pull up
+	NVIC_ClearPendingIRQ(PORTB_IRQn);
+	NVIC_EnableIRQ(PORTB_IRQn);
 }
