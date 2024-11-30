@@ -3,7 +3,7 @@
 #include "ports.h"
 
 static inline void active_wait(unsigned long len) { while (--len) { } }
-_Noreturn void endless_error(void);
+void endless_error(void);
 
 int main(void)
 {
@@ -13,7 +13,7 @@ int main(void)
 	endless_error();
 }
 
-_Noreturn void endless_error(void) {
+void endless_error(void) {
 	enum { WAIT_TIME = 1000 };
     while (1) {
 		show(DIG_E, DIS_0);
