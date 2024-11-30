@@ -28,10 +28,11 @@ typedef enum {
 	STATE_MENU_TIME = 0x200,
 	STATE_MENU_BRIGHTNESS = 0x201,
 	STATE_BRIGHTNESS = 0x300,
+	STATE_LOW_POWER = 0x400,
 } State;
 
 static void btn_change(void);
-static void display(void);
+static void display(bool sleep);
 static void short_press(void);
 static void long_press(void);
 static void clock_tick(void);
@@ -64,7 +65,7 @@ int main(void)
 	init();
 
 	while (true) {
-		display();
+		display(true);
 	}
 }
 
@@ -90,7 +91,7 @@ static void btn_change(void) {
 
 	uint32_t press_time = NOW;
 	while (IS_PRESSED) {
-		display();
+		display(false);
 		if (NOW - press_time >= 2) {
 			long_press();
 			return;
@@ -99,7 +100,7 @@ static void btn_change(void) {
 	short_press();
 }
 
-static void display(void) {
+static void display(bool sleep) {
 	switch (state & STATE_PRIMARY) {
 		case STATE_SHOW_TIME:
 			show_time(1);
@@ -119,6 +120,15 @@ static void display(void) {
 				1
 			);
 			break;
+		case STATE_LOW_POWER:
+			if (sleep) {
+				SMC_STOPCTRL |= SMC_STOPCTRL_VLLSM(0x3);
+				SMC_PMCTRL |= SMC_PMCTRL_STOPM(0x4);
+				__WFI();
+			} else {
+				show_time(1);
+			}
+			break;
 		default:
 			show_digs(DIG_E, DIG_r, DIG_o, DIG_r, ~0);
 			break;
@@ -128,6 +138,7 @@ static void display(void) {
 static void short_press(void) {
 	switch (state & STATE_PRIMARY) {
 		case STATE_SHOW_TIME:
+			state = STATE_LOW_POWER;
 			break;
 		case STATE_EDIT_TIME:
 			++time[state & STATE_SEC];
@@ -143,6 +154,9 @@ static void short_press(void) {
 			if (brightness > 10) {
 				brightness = 0;
 			}
+			break;
+		case STATE_LOW_POWER:
+			state = STATE_SHOW_TIME;
 			break;
 	}
 }
@@ -170,6 +184,9 @@ static void long_press(void) {
 			rtc_tick(true);
 			break;
 		case STATE_BRIGHTNESS:
+			state = STATE_SHOW_TIME;
+			break;
+		case STATE_LOW_POWER:
 			state = STATE_SHOW_TIME;
 			break;
 	}

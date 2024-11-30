@@ -38,6 +38,8 @@ typedef enum {
 	DIG_t = DIG_E & ~SEG_A,
 	DIG_b = DIG_t | SEG_C,
 	DIG_BACK = SEG_G,
+
+	DIG_1_2 = SEG_E | SEG_F,
 } Digit;
 
 typedef enum {
