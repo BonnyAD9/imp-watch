@@ -16,6 +16,7 @@ typedef enum {
 
 typedef enum {
 	DIG_ALL = 0xf0f,
+	DIG_NONE = 0,
 	DIG_0 = DIG_ALL & ~SEG_DP & ~SEG_G,
 	DIG_1 = SEG_B | SEG_C,
 	DIG_2 = DIG_ALL & ~SEG_DP & ~SEG_C & ~SEG_F,
@@ -34,6 +35,7 @@ typedef enum {
 
 typedef enum {
 	DIS_ALL = 0xf00,
+	DIS_NONE = 0,
 	DIS_0 = 1 << 11,
 	DIS_1 = 1 << 10,
 	DIS_2 = 1 << 9,

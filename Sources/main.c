@@ -8,9 +8,12 @@
 #include "rtc.h"
 
 // Active wait time for each of the displays
-#define DISPLAY_DELAY 1000
+#define DISPLAY_DELAY 100
+// Maximum brightness
+#define MAX_BRIGHTNESS 10
 
 static void clock_tick(void);
+static void bright_wait(void);
 static void init(void);
 noreturn static void endless_error(void);
 noreturn static void endless_time(void);
@@ -23,6 +26,8 @@ static unsigned hl = 0;
 static unsigned mh = 0;
 // Minutes low (second digit)
 static unsigned ml = 0;
+
+static unsigned brightness = 10;
 
 int main(void)
 {
@@ -68,6 +73,12 @@ static void clock_tick(void) {
 	hh = 0;
 }
 
+static void bright_wait(void) {
+	active_wait(brightness * DISPLAY_DELAY);
+	show(DIG_NONE, DIS_NONE);
+	active_wait((MAX_BRIGHTNESS - brightness) * DISPLAY_DELAY);
+}
+
 static void init(void) {
 	// Disable watchdog
 	SIM_COPC = 0;
@@ -79,13 +90,13 @@ static void init(void) {
 noreturn static void endless_time(void) {
     while (1) {
 		show(DIGIT[hh], DIS_0);
-		active_wait(DISPLAY_DELAY);
+		bright_wait();
 		show(DIGIT[hl] | SEG_DP, DIS_1);
-		active_wait(DISPLAY_DELAY);
+		bright_wait();
 		show(DIGIT[mh], DIS_2);
-		active_wait(DISPLAY_DELAY);
+		bright_wait();
 		show(DIGIT[ml], DIS_3);
-		active_wait(DISPLAY_DELAY);
+		bright_wait();
     }
 }
 
