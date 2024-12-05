@@ -5,6 +5,7 @@
 
 #include "gpio.h"
 
+/// @brief Time digits that are displayed.
 extern unsigned time[];
 
 // Hours high (first digit)
@@ -16,9 +17,14 @@ extern unsigned time[];
 // Minutes low (second digit)
 #define ML (time[3])
 
+/// @brief Tick the clock.
 void clock_tick(void);
+
+/// @brief Truncate the clock to valid values.
 void clock_truncate(void);
 
+/// @brief Show time on the display.
+/// @param dot Which of the time values has the dot.
 static void show_time(size_t dot) {
 	for (size_t i = 0; i < DISPLAY_LEN; ++i) {
 		Digit base = i == dot ? SEG_DP : DIG_NONE;

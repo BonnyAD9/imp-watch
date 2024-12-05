@@ -18,7 +18,7 @@ void rtc_init(void) {
     // Wait is not necessary, the clock is just a little slower at the start.
     //active_wait(0x500000);
 
-    RTC_TAR = 0;
+    RTC_TAR = TICK_LEN - 1;
 
     // Initial time is 0
     RTC_TSR = 0;

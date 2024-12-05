@@ -45,8 +45,6 @@ static void init(void);
 
 static State state = STATE_SHOW_TIME;
 
-static Digit MENU_DIGITS[] = { DIG_t, DIG_b, DIG_NONE, DIG_NONE };
-
 int main(void)
 {
 	init();
@@ -59,9 +57,9 @@ int main(void)
 /// @brief RTC clock tick handler.
 void RTC_IRQHandler(void) {
 	if (RTC_SR & RTC_SR_TAF_MASK) {
+		// Detect future overflow
 		uint32_t alarm = RTC_TAR;
 		uint32_t alarm2 = alarm + TICK_LEN;
-		// Detect future overflow
 		if (alarm2 < alarm) {
 			// Reset the clock when it would overflow
 			rtc_reset();
@@ -77,11 +75,14 @@ void RTC_IRQHandler(void) {
 	}
 }
 
+/// @brief Button edge
 void PORTB_IRQHandler(void) {
+	// Wait for the stable value.
 	active_wait(PRESS_DELAY);
 
 	btn_change();
 
+	// Mark the button press as handled.
 	PORTB_ISFR = PORTB_ISFR;
 }
 
@@ -93,6 +94,7 @@ static void btn_change(void) {
 	uint32_t press_time = NOW;
 	while (IS_PRESSED) {
 		display(false);
+		// Detect long press
 		if (NOW - press_time >= 2) {
 			long_press();
 			return;
@@ -122,6 +124,7 @@ static void display(bool sleep) {
 			);
 			break;
 		case STATE_LOW_POWER:
+			// DO NOT CALL WFI WHEN INTERUPTED.
 			if (sleep) {
 				__WFI();
 			} else {
@@ -199,7 +202,8 @@ static void init(void) {
 	rtc_init();
 
 	// VLLS3
-	SMC_STOPCTRL |= SMC_STOPCTRL_VLLSM(0x3);
+	SMC_STOPCTRL =
+		(SMC_STOPCTRL & ~SMC_STOPCTRL_VLLSM_MASK) | SMC_STOPCTRL_VLLSM(0x3);
 	// VLLSx | VLPR
 	SMC_PMCTRL = SMC_PMCTRL_STOPM(0x4) | SMC_PMCTRL_RUNM(0x2);
 }
