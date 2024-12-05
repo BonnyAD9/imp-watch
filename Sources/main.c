@@ -9,22 +9,31 @@
 #include "rtc.h"
 #include "clock.h"
 
-// How long to wait for button value to stabilize
+/// @brief How long to wait for button value to stabilize
 #define PRESS_DELAY 100
 
+/// Run state
 typedef enum {
+	// State masks
+	/// @brief Primary state mask
 	STATE_PRIMARY = 0xff00,
+	/// @brief Secondary state mask.
 	STATE_SEC = 0xff,
+	/// @brief Show time mode.
 	STATE_SHOW_TIME = 0x0,
+	/// @brief Edit time mode.
 	STATE_EDIT_TIME = 0x100,
 	STATE_EDIT_TIME_HH = 0x100,
 	STATE_EDIT_TIME_HL,
 	STATE_EDIT_TIME_MH,
 	STATE_EDIT_TIME_ML,
+	/// @brief Menu mode
 	STATE_MENU = 0x200,
 	STATE_MENU_TIME = 0x200,
 	STATE_MENU_BRIGHTNESS = 0x201,
+	/// @brief Set brightness mode.
 	STATE_BRIGHTNESS = 0x300,
+	/// @brief Low power, display off mode.
 	STATE_LOW_POWER = 0x400,
 } State;
 
@@ -47,10 +56,24 @@ int main(void)
 	}
 }
 
+/// @brief RTC clock tick handler.
 void RTC_IRQHandler(void) {
 	if (RTC_SR & RTC_SR_TAF_MASK) {
-		RTC_TAR += TICK_LEN;
+		uint32_t alarm = RTC_TAR;
+		uint32_t alarm2 = alarm + TICK_LEN;
+		// Detect future overflow
+		if (alarm2 < alarm) {
+			// Reset the clock when it would overflow
+			rtc_reset();
+		} else {
+			// No overflow
+			RTC_TAR = alarm2;
+		}
 		clock_tick();
+	} if (RTC_SR & (RTC_SR_TOF_MASK | RTC_SR_TIF_MASK)) {
+		// Shouldn't happen, but if it does, reset the clock. Some precision
+		// may be lost
+		rtc_reset();
 	}
 }
 

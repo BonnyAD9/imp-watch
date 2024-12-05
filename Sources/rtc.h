@@ -18,6 +18,13 @@ static inline void rtc_tick(bool v) {
     }
 }
 
+static inline void rtc_reset() {
+    RTC_TAR = 0;
+    RTC_SR &= ~RTC_SR_TCE_MASK;
+    RTC_TSR = 0;
+    RTC_SR |= RTC_SR_TCE_MASK;
+}
+
 void rtc_init(void);
 
 #endif // RTC_H_INCLUDED

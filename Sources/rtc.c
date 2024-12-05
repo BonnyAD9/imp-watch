@@ -18,8 +18,7 @@ void rtc_init(void) {
     // Wait is not necessary, the clock is just a little slower at the start.
     //active_wait(0x500000);
 
-    // Set alarm for every 60 seconds
-    RTC_TAR = TICK_LEN;
+    RTC_TAR = 0;
 
     // Initial time is 0
     RTC_TSR = 0;
