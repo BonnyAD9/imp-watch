@@ -100,8 +100,6 @@ static void display(bool sleep) {
 			break;
 		case STATE_LOW_POWER:
 			if (sleep) {
-				SMC_STOPCTRL |= SMC_STOPCTRL_VLLSM(0x3);
-				SMC_PMCTRL |= SMC_PMCTRL_STOPM(0x4);
 				__WFI();
 			} else {
 				show_time(1);
@@ -176,4 +174,9 @@ static void init(void) {
 
 	gpio_init();
 	rtc_init();
+
+	// VLLS3
+	SMC_STOPCTRL |= SMC_STOPCTRL_VLLSM(0x3);
+	// VLLSx | VLPR
+	SMC_PMCTRL = SMC_PMCTRL_STOPM(0x4) | SMC_PMCTRL_RUNM(0x2);
 }
