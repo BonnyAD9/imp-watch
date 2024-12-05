@@ -7,11 +7,8 @@
 #include "gpio.h"
 #include "utility.h"
 #include "rtc.h"
+#include "clock.h"
 
-// Active wait time for each of the displays
-#define DISPLAY_DELAY 100
-// Maximum brightness
-#define MAX_BRIGHTNESS 10
 // How long to wait for button value to stabilize
 #define PRESS_DELAY 100
 
@@ -35,30 +32,11 @@ static void btn_change(void);
 static void display(bool sleep);
 static void short_press(void);
 static void long_press(void);
-static void clock_tick(void);
-static void clock_truncate(void);
-static void bright_wait(void);
 static void init(void);
-static void show_time(size_t dot);
-static inline void show_msg(Digit *d, size_t dot);
-static inline void show_digs(Digit a, Digit b, Digit c, Digit d, size_t dot);
 
 static State state = STATE_SHOW_TIME;
 
-static unsigned time[] = { 0, 0, 0, 0 };
-
 static Digit MENU_DIGITS[] = { DIG_t, DIG_b, DIG_NONE, DIG_NONE };
-
-// Hours high (first digit)
-#define HH (time[0])
-// Hours low (second digit)
-#define HL (time[1])
-// Minutes high (first digit)
-#define MH (time[2])
-// Minutes low (second digit)
-#define ML (time[3])
-
-static unsigned brightness = 10;
 
 int main(void)
 {
@@ -192,94 +170,10 @@ static void long_press(void) {
 	}
 }
 
-static void clock_tick(void) {
-	++ML;
-	if (ML < 10) {
-		return;
-	}
-
-	ML = 0;
-	++MH;
-	if (MH < 6) {
-		return;
-	}
-
-	MH = 0;
-	++HL;
-	if ((HL < 10 && HH < 2) || (HL < 4 && HH < 3)) {
-		return;
-	}
-
-	HL = 0;
-	++HH;
-	if (HH < 3) {
-		return;
-	}
-
-	HH = 0;
-}
-
-static void clock_truncate(void) {
-	if (ML >= 10) {
-		ML = 0;
-	}
-
-	if (MH >= 10) {
-		MH = 0;
-	}
-
-	if (HH > 2) {
-		HH = 0;
-	}
-
-	if (HL >= 10 || (HH >= 2 && HL >= 4)) {
-		HL = 0;
-	}
-}
-
-static void bright_wait(void) {
-	active_wait(brightness * DISPLAY_DELAY);
-	show(DIG_NONE, DIS_NONE);
-	active_wait((MAX_BRIGHTNESS - brightness) * DISPLAY_DELAY);
-}
-
 static void init(void) {
 	// Disable watchdog
 	SIM_COPC = 0;
 
 	gpio_init();
 	rtc_init();
-}
-
-noreturn static void endless_time(void) {
-    while (1) {
-		show_time(1);
-    }
-}
-
-noreturn static void endless_error(void) {
-    while (true) {
-		show_err();
-    }
-}
-
-static void show_time(size_t dot) {
-	for (size_t i = 0; i < DISPLAY_LEN; ++i) {
-		Digit base = i == dot ? SEG_DP : DIG_NONE;
-		show(DIGIT[time[i]] | base, DISPLAY[i]);
-		bright_wait();
-	}
-}
-
-static inline void show_msg(Digit *d, size_t dot) {
-	for (size_t i = 0; i < DISPLAY_LEN; ++i) {
-		Digit base = i == dot ? SEG_DP : DIG_NONE;
-		show(d[i] | base, DISPLAY[i]);
-		bright_wait();
-	}
-}
-
-static inline void show_digs(Digit a, Digit b, Digit c, Digit d, size_t dot) {
-	Digit msg[] = { a, b, c, d };
-	show_msg(msg, dot);
 }

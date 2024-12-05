@@ -1,7 +1,19 @@
 #ifndef GPIO_H_INCLUDED
 #define GPIO_H_INCLUDED
 
+#include <stddef.h>
+
 #include "MKL05Z4.h"
+
+#include "utility.h"
+
+#define IS_PRESSED (!(GPIOB_PDIR & SEG_BTN))
+// Active wait time for each of the displays
+#define DISPLAY_DELAY 100
+// Maximum brightness
+#define MAX_BRIGHTNESS 10
+
+extern unsigned brightness;
 
 typedef enum {
 	SEG_A = 1 << 0,
@@ -14,8 +26,6 @@ typedef enum {
 	SEG_DP = 1 << 3,
 	SEG_BTN = 1 << 4,
 } Segment;
-
-#define IS_PRESSED (!(GPIOB_PDIR & SEG_BTN))
 
 typedef enum {
 	DIG_ALL = 0xf0f,
@@ -38,8 +48,6 @@ typedef enum {
 	DIG_t = DIG_E & ~SEG_A,
 	DIG_b = DIG_t | SEG_C,
 	DIG_BACK = SEG_G,
-
-	DIG_1_2 = SEG_E | SEG_F,
 } Digit;
 
 typedef enum {
@@ -65,6 +73,25 @@ static inline void show(Digit val, Display dis) {
 	GPIOB_PCOR = DIG_ALL;
 	GPIOA_PCOR = dis;
 	GPIOB_PSOR = val;
+}
+
+static inline void bright_wait() {
+	active_wait(brightness * DISPLAY_DELAY);
+	show(DIG_NONE, DIS_NONE);
+	active_wait((MAX_BRIGHTNESS - brightness) * DISPLAY_DELAY);
+}
+
+static inline void show_msg(Digit *d, size_t dot) {
+	for (size_t i = 0; i < DISPLAY_LEN; ++i) {
+		Digit base = i == dot ? SEG_DP : DIG_NONE;
+		show(d[i] | base, DISPLAY[i]);
+		bright_wait();
+	}
+}
+
+static inline void show_digs(Digit a, Digit b, Digit c, Digit d, size_t dot) {
+	Digit msg[] = { a, b, c, d };
+	show_msg(msg, dot);
 }
 
 #endif // GPIO_H_INCLUDED

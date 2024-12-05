@@ -2,6 +2,8 @@
 
 #include "MKL05Z4.h"
 
+unsigned brightness = 10;
+
 void gpio_init(void) {
 	// Enable clock on ports
 	SIM_SCGC5 = SIM_SCGC5_PORTA_MASK | SIM_SCGC5_PORTB_MASK;
