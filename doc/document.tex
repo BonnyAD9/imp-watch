@@ -1,0 +1,163 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[czech]{babel}
+
+\title{Š - ARM-KL05: LED náramkové hodinky na bázi RTC modulu}
+\author{Jakub Antonín Štigler (xstigl00)}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Popis projektu}
+V projektu jsem implementoval program realizující hodinky pro mikrokontrolér
+KL05Z32 s čtyř ciferným sedmi segmentovým displayem (+ tečka) za pomocí RTC
+modulu. Hodinky jsou ovládány pomocí jednoho tlačítka.
+
+Hodniky umí měřit čas a zobrazují hodiny a minuty. Dají se přepnout do
+úsporného režimu kdy nesvítí display ale čas se stále počítá. Na hodinkách se
+dá nastavit čas a i jas displaye.
+
+\subsection{Použití hodinek}
+Po připojení zdroje (baterky) hodinky rozsvítí display a začnou počítat čas od
+půlnoci. Čas se zobrazuje pomocí 24. hodinového formátu: \verb|HH.MM|
+(\verb|HH| jsou hodiny, \verb|MM| jsou minuty).
+
+Pro ovládání hodinek slouží jedno tlačítko na kterém se rozlišuje krátké a
+dlouhé stisknutí. Dlouhé stisknutí je když je tlačítko zmáčknuto na více než
+1 - 2 sekundy a krátké stisknutí je když se tlačítko uvolněno dříve než uplyne
+čas pro detekci dlouhého stisknutí.
+
+Když se hodniky zapnou, tak jsou ve stavu kdy zobrazují čas. Čas je na začátku
+nasavený na půlnoc (\verb|00.00|).
+
+\subsubsection{Uspání}
+
+Uspání hodinek se dá docílit pomocí krátkého zmáčknutí tlačítka když jsou
+hodinky ve stavu zobrazování času.
+
+Hodinky se dají opět probudit pomocí krátkého nebo dlouhého stisknutí tlačítka.
+
+\subsubsection{Menu}
+
+Menu se dá otevřít pomocí dlouhého zmáčknutí tlačítka když jsou hodinky ve
+stavu zobrazování času. Menu obsahuje dvě možnosti:
+\begin{itemize}
+    \item \textbf{t} - nastavení času (time).
+    \item \textbf{b} - nastavení jasu (brightness)
+\end{itemize}
+Označená možnost je znázorněná pomocí tečky vpravo dole vedle možnosti. Ozačená
+možnost se dá vybrat pomocí krátkého zmáčknutí. Pokud je označena poslední
+možnost, tak krátké zmáčknutí tlačítka zavře menu. Dlouhé podržení tlačítka
+otevře příslušné nastavení (času nebo jasu) podle označené možnosti.
+
+\subsubsection{Nastavení času}
+
+Čas se dá nastavit otevřením možnosti \textbf{t} v menu (stisknutí ze stavu
+zobrazování času: dlouhé (otevření menu), dlouhé (otevření nastavení času)).
+
+Ve chvíli kdy se otevře nastavení času, tak se zobrazí aktuálně nastavený čas
+a čas se přestane počítat. Čas se nastavuje po jednotlivých cifrách. Vybraná
+cifra se dá poznat podle tečky vpravo dole od cifry.
+
+Krátké zmáčknutí tlačítka zvíší vybranou cifru o jedna, pokud už je na
+maximální hodnotě, tak se cifra nastaví zpět na 0.
+
+Dlouhé zmáčknutí přesne výběr na další cifru. Pokud byla vabrána poslední
+cifra, tak se hodinky přepnou do stavu zobrazení času a začnou zase počítat
+čas.
+
+\subsubsection{Nastavení jasu}
+
+Jas se dá nastavit otevřením možnosti \textbf{b} v menu (stisknutí ze stavu
+zobrazování času: dlouhé (otevření menu), krátké (označení \textbf{b}), dlouhé
+(otevření nastavení jasu))
+
+Hodniky podporují 11 úrovní jasu (0 - 10). Krátké zmáčknutí tlačítka zvýší jas
+o 1, pokud už byl jas na maximální hodnotě, tak se nastaví zpět na 0.
+
+Dlouhé podržení aplikuje nastavený jas a přepne hodinky zpět do stavu
+zobrazování času.
+
+\section{Způsob řešení}
+
+Zdrojový kód jsem rozdělil do několika modulů:
+\begin{itemize}
+    \item \textit{main} - Ukládá stav hodinek a definuje přechody mezi stavy.
+    \item \textit{clock} - Spravuje stav hodin (času).
+    \item \textit{rtc} - Lehká abstrakce nad modulem RTC.
+    \item \textit{gpio} - Lehká obstrakce nad modulem GPIO za cílem použití
+          sedmi segmentového diplaye a tlačítka.
+    \item \textit{utility} - Funkce pro aktivní čakání.
+\end{itemize}
+
+\subsection{Modul main}
+
+Stav je ukládán ve statické globální proměnné \verb|state|. Jednotlivé stavy
+jsou definovány v enumeraci \verb|State|.
+
+Významné funkce jsou:
+\begin{itemize}
+    \item \verb|display| - Podle stavu rozhoduje co se má zobrazit.
+    \item \verb|short_press| - Definuje chování po krátkém stisknutí tlačítka
+          na základě stavu.
+    \item \verb|long_press| - Definuje chování po dlouhém stisknutí tlačítka
+          na základě stavu.
+\end{itemize}
+
+\subsection{Modul clock}
+
+Čas je ukládán po jednotlivých cifrách v globálním poli \verb|time|.
+
+Pro zvýšení času slouží funkce \verb|clock_tick|. Používá se zejména při
+přerušení z RTC modulu.
+
+\subsection{Modul rtc}
+
+Hodiny se dají pozastavit/zapnout pomocí funkce \verb|rtc_tick|.
+
+Funkce \verb|rtc_reset| slouží pro obnovení hodin. Používá se zejména když by
+hrozilo přetečení počítadla sekund.
+
+\subsection{Modul gpio}
+
+Modul obsahuje enumerace pro pojmenování konfikrace displaye:
+\begin{itemize}
+    \item \verb|Segment| - Pojmenovává jednotlivé segmenty displaye.
+    \item \verb|Digit| - Skládá segmenty displaye do znaků.
+    \item \verb|Display| - Pojmenovává jednotlivé displaye.
+\end{itemize}
+
+Pro převod cifry na znak pro display slouží globální pole \verb|DIGIT|. Pro id
+displaye na jeho port pak pole \verb|DISPLAY|.
+
+Pro zobrazování na znaků display slouží funkce \verb|show|, \verb|show_msg| a
+\verb|show_digs|.
+
+Jas displaye se ovládá poměrem aktivního čekání se zapnutým displayem a s
+vypnutým displayem. Toto realizuje funkce \verb|bright_wait|.
+
+Jas se ukládá v globální proměnné \verb|brightness|.
+
+\section{Závěr}
+
+Hodinky umí měřit čas a podporují úsporný režim a mají jednoduché uživatelsky
+přívětivé ovládání pomocí jednoho tlačítka.
+
+Oproti zadání jde na hodinkách i navíc nastavit jas a nebylo by příliš složité
+do kódu implementovat i další funkcionality, jako třeba nastavení formátu hadin
+(na 12. hodinový) nebo nastavení automatického uspání/probuzení/změny jasu
+podle času. Největší limitací pro implementaci je umožnit nastavení pomocí
+sedmi segmentového displaye.
+
+V implementaci jsou ošetřené i krajní případy, jako třeba přetečení počítadla
+v modulu RTC. Nesem si vědom žádných problémů nebo nedostatků.
+
+\end{document}
