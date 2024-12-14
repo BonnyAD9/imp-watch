@@ -8,8 +8,6 @@
 #include "utility.h"
 
 #define IS_PRESSED (!(GPIOB_PDIR & SEG_BTN))
-// Active wait time for each of the displays
-#define DISPLAY_DELAY 100
 // Maximum brightness
 #define MAX_BRIGHTNESS 10
 
@@ -89,9 +87,9 @@ static inline void show(Digit val, Display dis) {
 
 /// @brief Show the current display value with brightness.
 static inline void bright_wait() {
-	active_wait(brightness * DISPLAY_DELAY);
+	active_wait(1 << brightness);
 	show(DIG_NONE, DIS_NONE);
-	active_wait((MAX_BRIGHTNESS - brightness) * DISPLAY_DELAY);
+	active_wait(1 << (MAX_BRIGHTNESS - brightness));
 }
 
 /// @brief Show the given characters on the display.

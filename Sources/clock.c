@@ -34,7 +34,7 @@ void clock_truncate(void) {
 		ML = 0;
 	}
 
-	if (MH >= 10) {
+	if (MH >= 6) {
 		MH = 0;
 	}
 

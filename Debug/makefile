@@ -51,7 +51,7 @@ all: imp-watch.elf secondary-outputs
 imp-watch.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross ARM C++ Linker'
-	arm-none-eabi-g++ -mcpu=cortex-m0plus -mthumb -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -T "MKL05Z32xxx4_flash.ld" -Xlinker --gc-sections -L"/mnt/x/prog/kds/imp-watch/imp-watch/Project_Settings/Linker_Files" -Wl,-Map,"imp-watch.map" -specs=nano.specs -specs=nosys.specs -o "imp-watch.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-g++ -mcpu=cortex-m0plus -mthumb -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -T "MKL05Z32xxx4_flash.ld" -Xlinker --gc-sections -L"/home/kubas/prog/kds/imp-watch/imp-watch/Project_Settings/Linker_Files" -Wl,-Map,"imp-watch.map" -specs=nano.specs -specs=nosys.specs -o "imp-watch.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
